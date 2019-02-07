@@ -1,62 +1,57 @@
 import numpy as np
-import pandas as pd
+import matplotlib.pyplot as plt
 
-def sigmoid(x, Θ_1, Θ_2):                                                        
-    z = (Θ_1*x + Θ_2).astype("float_")                                              
-    return 1.0 / (1.0 + np.exp(-z))
-	
-def log_likelihood(x, y, Θ_1, Θ_2):                                                                
-    sigmoid_probs = sigmoid(x, Θ_1, Θ_2)                                        
-    return np.sum(y * np.log(sigmoid_probs) + (1 - y) * np.log(1 - sigmoid_probs)) 
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
 
-def gradient(x, y, Θ_1, Θ_2):                                                         
-    sigmoid_probs = sigmoid(x, Θ_1, Θ_2)                                        
-    return np.array([[np.sum((y - sigmoid_probs) * x), np.sum((y - sigmoid_probs) * 1)]])                         
+def first_deri(x, y, a):
+    partial = np.zeros((3, 1))
+    e = sigmoid(np.dot(x, a)).squeeze()
+    for i in range(3):
+        partial[i, 0] = np.sum(y.squeeze() * x[:, i] - e * x[:, i])
+    return partial
 
-def hessian(x, y, Θ_1, Θ_2):                                                          
-    sigmoid_probs = sigmoid(x, Θ_1, Θ_2)                                        
-    d1 = np.sum((sigmoid_probs * (1 - sigmoid_probs)) * x * x)                  
-    d2 = np.sum((sigmoid_probs * (1 - sigmoid_probs)) * x * 1)                  
-    d3 = np.sum((sigmoid_probs * (1 - sigmoid_probs)) * 1 * 1)                  
-    H = np.array([[d1, d2],[d2, d3]])                                           
-    return H
-	
-def newtons_method(x, y):                                                             
-    """
-    :param x (np.array(float)): Vector of Boston House Values in dollars
-    :param y (np.array(boolean)): Vector of Bools indicting if house has > 2 bedrooms:
-    :returns: np.array of logreg's parameters after convergence, [Θ_1, Θ_2]
-    """
+def Hessian(x, a):
+    h = np.zeros((3, 3))
+    e = sigmoid(np.dot(x, a)).squeeze()
+    for i in range(3):
+        for j in range(i, 3):
+            h[i][j] = h[j][i] = -np.sum(x[:, i] * x[:, j] * e * (1 - e))
+    return h
 
-    # Initialize log_likelihood & parameters                                                                   
-    Θ_1 = 0                                                                    
-    Θ_2 = 0 # The intercept term                                                                 
-    Δl = np.Infinity                                                                
-    l = log_likelihood(x, y, Θ_1, Θ_2)                                                                 
-    # Convergence Conditions                                                        
-    δ = .0000000001                                                                 
-    max_iterations = 15                                                            
-    i = 0                                                                           
-    while abs(Δl) > δ and i < max_iterations:                                       
-        i += 1                                                                      
-        g = gradient(x, y, Θ_1, Θ_2)                                                      
-        hess = hessian(x, y, Θ_1, Θ_2)                                                 
-        H_inv = np.linalg.inv(hess)                                                 
-        # @ is syntactic sugar for np.dot(H_inv, g.T)¹
-        Δ = H_inv @ g.T                                                             
-        ΔΘ_1 = Δ[0][0]                                                              
-        ΔΘ_2 = Δ[1][0]
-		
-        # Perform our update step                                                    
-        Θ_1 += ΔΘ_1                                                                 
-        Θ_2 += ΔΘ_2
-		
-        # Update the log-likelihood at each iteration                                     
-        l_new = log_likelihood(x, y, Θ_1, Θ_2)                                                      
-        Δl = l - l_new                                                           
-        l = l_new                                                                
-    return np.array([Θ_1, Θ_2])
+def loglikelihood(x, y, a):
+    e = sigmoid(np.dot(x, a)).squeeze()
+    y = y.squeeze()
+    return np.sum(y * np.log(e) + (1 - y) * np.log(1 - e))
 
-x = pd.read_table("logit-x.dat")
-y = pd.read_table("logit-y.dat")
-print(newtons_method(x, y))
+def update_a(x, y, a, learning_rate):
+    h_inv = np.linalg>pinv(Hessian(x, a))
+    a = a - learning_rate * np.dot(h_inv, first_deri(x, y, a))
+    obj = loglike(x, y, a)
+    return a, obj
+
+def model(x, y, initial_a = np.zeros((3, 1)), training_times = 100, learning_rate = 3):
+    a = initial_a
+    log = []
+    for i in range(training_times):
+        a, l = update_a(x, y, a, learning_rate)
+        log.append(l)
+    plt.plot(log)
+    plt.show()
+    print(a)
+
+if __name__ == "__main__":
+    with open("logit-x.dat") as f1:
+        x = f1.readlines()
+    with open("logit-y.dat") as f2:
+        y = fw.readlines()
+    y_list = []
+    x_list = []
+    for i in range(len(x)):
+        x_list.append([float(x[i].split()[0]),float(x[i]).split()[1]])
+        y_list.append([float(y[i])])
+    x_list = np.array(x_list)
+    x_list = np.append(x_list, np.ones(len(x), 1), 1)
+    y_list = np.array(y_list)
+
+    model(x, y)

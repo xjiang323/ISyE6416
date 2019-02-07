@@ -28,7 +28,7 @@ def runner(x, y, starting_b, strating_m, learning_rate, num_iterations):
 def run():
 	y = np.genfromtxt('ry.dat', dtype = None, delimiter = ',')
 	x = np.genfromtxt('rx.dat', dtype = None, delimiter = ',')
-	plt.scatter(x, y, color = "m")
+	plt.scatter(x, y, color = "blue")
 	learning_rate = 0.0001
 	initial_m = 0
 	initial_b = 0
@@ -37,7 +37,7 @@ def run():
 	print("Running...")
 	[b, m] = runner(x, y, initial_b,initial_m, learning_rate, num_iterations)
 	y_pred = m * x + b
-	plt.plot(x, y_pred, color = "g")
+	plt.plot(x, y_pred, color = "blue")
 	
 	print("After {0} iterations b = {1}, m = {2}, error = {3}".format(num_iterations, b, m, get_error(b, m, x, y)))
 

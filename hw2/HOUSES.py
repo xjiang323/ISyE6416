@@ -10,22 +10,15 @@ data = pd.read_csv('RealEstate.csv')
 
 data1 = data.loc[data['Status'] == 'Short Sale',:]
 data1 = data1.loc[:, data1.columns != 'Status']
-data_1 = data1.select_dtypes(include=[object])
-le = preprocessing.LabelEncoder()
-data_1 = data_1.apply(le.fit_transform)
-data1['Location'] = data_1['Location']
+data1 = pd.get_dummies(data1)
 
 data2 = data.loc[data['Status'] == 'Foreclosure',:]
 data2 = data2.loc[:, data2.columns != 'Status']
-data_2 = data2.select_dtypes(include=[object])
-data_2 = data_2.apply(le.fit_transform)
-data2['Location'] = data_2['Location']
+data2 = pd.get_dummies(data2)
 
 data3 = data.loc[data['Status'] == 'Regular',:]
 data3 = data3.loc[:,data3.columns != 'Status']
-data_3 = data3.select_dtypes(include=[object])
-data_3 = data_3.apply(le.fit_transform)
-data3['Location'] = data_3['Location']
+data3 = pd.get_dummies(data3)
 
 x_data1 = data1.loc[:, data1.columns != 'Price' ]
 y_data1 = data1.loc[:, data1.columns == 'Price']
